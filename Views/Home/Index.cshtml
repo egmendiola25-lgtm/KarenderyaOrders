@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Karenderya Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Orders</h5>
+                    <h2>@ViewBag.TotalOrders</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Sales</h5>
+                    <h2>₱@(((decimal)ViewBag.TodaySales).ToString("N2"))</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Low-Stock Items</h5>
+                <h2>@((int)ViewBag.LowStockCount)</h2>
+            </div>
+        </div>
+    </div>
+
+    <h3>Low-Stock Food Items</h3>
+
+    @if (ViewBag.LowStockItems.Count == 0)
+    {
+        <p class="text-muted">No low-stock items right now.</p>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Food Item</th>
+                    <th>Price</th>
+                    <th>Stock Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.LowStockItems)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>₱@item.Price.ToString("N2")</td>
+                        <td>
+                            <span class="badge bg-danger">@item.StockQuantity</span>
+                        </td>
+                   </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <a asp-controller="Orders" asp-action="Index" class="btn btn-primary">
+        View Orders
+    </a>
+
+    <a asp-controller="FoodItems" asp-action="Index" class="btn btn-secondary">
+        Manage Food Items
+    </a>
+</div>

@@ -1,0 +1,138 @@
+﻿@model IEnumerable<KarenderyaOrders.Models.Order>
+
+<h1>Orders</h1>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create Order</a>
+</p>
+
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text"
+               name="searchString"
+               value="@ViewBag.SearchString"
+               class="form-control"
+               placeholder="Search by order number..." />
+
+        <select name="status" class="form-select">
+            <option value="">All Statuses</option>
+            <option value="Pending" selected="@(ViewBag.SelectedStatus == "Pending")">Pending</option>
+            <option value="Completed" selected="@(ViewBag.SelectedStatus == "Completed")">Completed</option>
+            <option value="Cancelled" selected="@(ViewBag.SelectedStatus == "Cancelled")">Cancelled</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a asp-action="Index" class="btn btn-secondary">Clear</a>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Order Number</th>
+            <th>Status</th>
+            <th>Date Created</th>
+            <th>Total Amount</th>
+            <th>Food Item</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.OrderNumber</td>
+                <td>
+                    <span class="badge bg-warning text-dark">@order.Status</span>
+                </td>
+                <td>@order.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</td>
+                <td>
+                    @foreach (var item in order.OrderItems)
+                    {
+                        <div>@item.FoodItem?.Name</div>
+                    }
+                </td>
+                <td>
+                    @foreach (var item in order.OrderItems)
+                    {
+                        <div>@item.Quantity</div>
+                    }
+                </td>
+                <td>₱@order.TotalAmount.ToString("N2")</td>
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@order.Id"
+                       class="btn btn-info btn-sm">
+                        Details
+                    </a>
+
+                    <form asp-action="Cancel"
+                          asp-route-id="@order.Id"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Are you sure you want to cancel this order? The stock will be restored.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Cancel
+                        </button>
+                    </form>
+
+                    <form asp-action="Complete"
+                          asp-route-id="@order.Id"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Are you sure you want to mark this order as Completed?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="btn btn-success btn-sm"
+                                @(order.Status != "Pending" ? "disabled" : "")>
+                            Complete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Orders pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                   asp-route-searchString="@ViewBag.SearchString"
+                   asp-route-status="@ViewBag.SelectedStatus">
+                    Previous
+                </a>
+            </li>
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-searchString="@ViewBag.SearchString"
+                       asp-route-status="@ViewBag.SelectedStatus">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                   asp-route-searchString="@ViewBag.SearchString"
+                   asp-route-status="@ViewBag.SelectedStatus">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

@@ -1,0 +1,18 @@
+﻿@model KarenderyaOrders.Models.FoodItem
+
+<h1>Delete Food Item</h1>
+
+<h3>Are you sure you want to delete this food item?</h3>
+
+<div class="mb-3">
+    <p><strong>Food Name:</strong> @Model.Name</p>
+    <p><strong>Price:</strong> @Model.Price.ToString("N2")</p>
+    <p><strong>Stock Quantity:</strong> @Model.StockQuantity</p>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
